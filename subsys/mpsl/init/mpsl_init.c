@@ -55,6 +55,8 @@ static void mpsl_low_prio_irq_handler(void)
 	k_sem_give(&sem_signal);
 }
 
+uint32_t debugsignal_thread[10]={0};
+uint32_t debugSignalThreadyEntry=0;
 static void signal_thread(void *p1, void *p2, void *p3)
 {
 	ARG_UNUSED(p1);
@@ -62,14 +64,19 @@ static void signal_thread(void *p1, void *p2, void *p3)
 	ARG_UNUSED(p3);
 
 	int errcode;
-
+debugsignal_thread[0]++;
 	while (true) {
+debugsignal_thread[1]++;
 		k_sem_take(&sem_signal, K_FOREVER);
-
+debugsignal_thread[2]++;
 		errcode = MULTITHREADING_LOCK_ACQUIRE();
+debugsignal_thread[3]++;
 		__ASSERT_NO_MSG(errcode == 0);
+debugsignal_thread[4]++;
 		mpsl_low_priority_process();
+debugsignal_thread[5]++;
 		MULTITHREADING_LOCK_RELEASE();
+debugsignal_thread[6]++;
 	}
 }
 

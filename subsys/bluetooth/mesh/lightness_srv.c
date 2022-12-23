@@ -192,6 +192,7 @@ void bt_mesh_lightness_srv_set(struct bt_mesh_lightness_srv *srv,
 	srv->handlers->light_set(srv, ctx, set, status);
 }
 
+uint8_t debugLightnessSrv=0;
 void lightness_srv_change_lvl(struct bt_mesh_lightness_srv *srv,
 			      struct bt_mesh_msg_ctx *ctx,
 			      struct bt_mesh_lightness_set *set,
@@ -201,7 +202,7 @@ void lightness_srv_change_lvl(struct bt_mesh_lightness_srv *srv,
 	bool state_change =
 		(atomic_test_bit(&srv->flags, LIGHTNESS_SRV_FLAG_IS_ON) ==
 		 (set->lvl == 0));
-
+        debugLightnessSrv++;
 	bt_mesh_lightness_srv_set(srv, ctx, set, status);
 
 	if (set->lvl != 0) {
@@ -536,7 +537,7 @@ static void lvl_get(struct bt_mesh_lvl_srv *lvl_srv,
 	BT_DBG("%i -> %i [%u ms]", rsp->current, rsp->target,
 	       rsp->remaining_time);
 }
-
+uint8_t debuglvl_set = 0;
 static void lvl_set(struct bt_mesh_lvl_srv *lvl_srv,
 		    struct bt_mesh_msg_ctx *ctx,
 		    const struct bt_mesh_lvl_set *lvl_set,
@@ -555,6 +556,7 @@ static void lvl_set(struct bt_mesh_lvl_srv *lvl_srv,
 		 * manual changes to the lightness should disable control.
 		 */
 		lightness_srv_disable_control(srv);
+        debuglvl_set++;
 		lightness_srv_change_lvl(srv, ctx, &set, &status, true);
 	} else if (rsp) {
 		srv->handlers->light_get(srv, NULL, &status);

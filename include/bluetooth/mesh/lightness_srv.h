@@ -80,7 +80,11 @@ struct bt_mesh_lightness_srv_handlers {
 	 * @param[in] set Parameters of the state change.
 	 * @param[out] rsp Response structure to be filled.
 	 */
-	void (*const light_set)(struct bt_mesh_lightness_srv *srv,
+	#ifdef CHAMP 
+	void (*light_set)(struct bt_mesh_lightness_srv *srv,
+	#else
+		void (*const light_set)(struct bt_mesh_lightness_srv *srv,
+	#endif	
 				struct bt_mesh_msg_ctx *ctx,
 				const struct bt_mesh_lightness_set *set,
 				struct bt_mesh_lightness_status *rsp);
@@ -94,7 +98,11 @@ struct bt_mesh_lightness_srv_handlers {
 	 * or NULL if it was not triggered by a message.
 	 * @param[out] rsp Response structure to be filled.
 	 */
+	#ifdef CHAMP 	 
+	void (*light_get)(struct bt_mesh_lightness_srv *srv,
+	#else
 	void (*const light_get)(struct bt_mesh_lightness_srv *srv,
+	#endif
 				struct bt_mesh_msg_ctx *ctx,
 				struct bt_mesh_lightness_status *rsp);
 

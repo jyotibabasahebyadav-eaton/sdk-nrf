@@ -358,7 +358,7 @@ struct bt_mesh_sensor {
 	 *
 	 *  @return 0 on success, or (negative) error code otherwise.
 	 */
-	int (*const get)(struct bt_mesh_sensor *sensor,
+	int (*get)(struct bt_mesh_sensor *sensor,
 			 struct bt_mesh_msg_ctx *ctx, struct sensor_value *rsp);
 
 	/* Internal state, overwritten on init. Should only be written to by

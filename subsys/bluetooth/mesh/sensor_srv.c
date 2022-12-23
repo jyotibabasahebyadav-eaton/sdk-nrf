@@ -3,10 +3,13 @@
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
-
+#define CHAMP 
 #include <string.h>
 #include <stdlib.h>
 #include <bluetooth/mesh/sensor_srv.h>
+#ifdef CHAMP
+#include <bluetooth/mesh/sensor_types.h>
+#endif
 #include <bluetooth/mesh/properties.h>
 #include "mesh/net.h"
 #include "mesh/access.h"
@@ -18,11 +21,24 @@
 #define LOG_MODULE_NAME bt_mesh_sensor_srv
 #include "common/log.h"
 
+#ifdef CHAMP
+#define CONFIG_BT_MESH_SENSOR_SRV 1
+#include "../../../../../../../../champsourcecode/CHAMPDefines.h"
+#define CONFIG_BT_MESH_SENSOR_SRV_SENSORS_MAX NUMBER_OF_SENSOR_IN_SYSTEM
+#else
+#define CONFIG_BT_MESH_SENSOR_SRV_SENSORS_MAX 6
+#endif
+#define CONFIG_BT_MESH_SENSOR_SRV_SETTINGS_MAX 8
 #define SENSOR_FOR_EACH(_list, _node)                                          \
 	SYS_SLIST_FOR_EACH_CONTAINER(_list, _node, state.node)
-
+uint32_t debugSensorpublishSensorSrv=0;
+#ifdef CHAMP
+struct bt_mesh_sensor *sensor_get(struct bt_mesh_sensor_srv *srv,
+					 uint16_t id)
+#else
 static struct bt_mesh_sensor *sensor_get(struct bt_mesh_sensor_srv *srv,
 					 uint16_t id)
+#endif
 {
 	struct bt_mesh_sensor *sensor;
 
@@ -107,6 +123,18 @@ static int buf_status_add(struct bt_mesh_sensor *sensor,
 {
 	struct sensor_value value[CONFIG_BT_MESH_SENSOR_CHANNELS_MAX] = {};
 	int err;
+#ifdef CHAMP
+	err = value_get(sensor, ctx, value);
+        //point to byte 2 since byte 1 is response type.
+        buf->data[buf->len]=sensor->type->id;
+        buf->len +=1;
+        *((int32_t *)(&(buf->data[buf->len])))=value->val1;
+        buf->len +=4;
+        *((int32_t *)(&(buf->data[buf->len])))=value->val2;
+        buf->len +=4;
+        err =0;
+        
+#else
 
 	err = value_get(sensor, ctx, value);
 	if (err) {
@@ -120,7 +148,7 @@ static int buf_status_add(struct bt_mesh_sensor *sensor,
 			err);
 		sensor_status_id_encode(buf, 0, sensor->type->id);
 	}
-
+#endif
 	return err;
 }
 
@@ -364,7 +392,16 @@ respond:
 
 	return 0;
 }
-
+#define CHAMP
+#ifdef CHAMP
+extern void nrfBLESensorSubscribe(struct bt_mesh_model *mod,struct bt_mesh_msg_ctx *ctx,struct net_buf_simple *buf);
+static void handleSensorStatus(struct bt_mesh_model *mod,
+			      struct bt_mesh_msg_ctx *ctx,
+			      struct net_buf_simple *buf)
+{
+   nrfBLESensorSubscribe(mod,ctx,buf);
+}
+#endif
 const struct bt_mesh_model_op _bt_mesh_sensor_srv_op[] = {
 	{
 		BT_MESH_SENSOR_OP_DESCRIPTOR_GET,
@@ -386,6 +423,7 @@ const struct bt_mesh_model_op _bt_mesh_sensor_srv_op[] = {
 		BT_MESH_LEN_MIN(BT_MESH_SENSOR_MSG_MINLEN_SERIES_GET),
 		handle_series_get,
 	},
+	{ BT_MESH_SENSOR_OP_STATUS, 3, handleSensorStatus },
 	BT_MESH_MODEL_OP_END,
 };
 
@@ -1046,7 +1084,7 @@ int bt_mesh_sensor_srv_pub(struct bt_mesh_sensor_srv *srv,
 	}
 
 	sensor_cadence_update(sensor, value);
-
+	debugSensorpublishSensorSrv++;
 	err = model_send(srv->model, ctx, &msg);
 	if (err) {
 		return err;
@@ -1066,14 +1104,14 @@ int bt_mesh_sensor_srv_sample(struct bt_mesh_sensor_srv *srv,
 	if (err) {
 		return -EBUSY;
 	}
-
+#ifndef CHAMP
 	if (sensor->state.configured &&
 	    sensor->type->channel_count == 1 &&
 	    !bt_mesh_sensor_delta_threshold(sensor, value)) {
 		BT_WARN("Outside threshold");
 		return -EALREADY;
 	}
-
+#endif
 	BT_DBG("Publishing 0x%04x", sensor->type->id);
 
 	return bt_mesh_sensor_srv_pub(srv, NULL, sensor, value);

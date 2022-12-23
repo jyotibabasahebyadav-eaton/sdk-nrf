@@ -184,23 +184,28 @@ void sdc_assertion_handler(const char *const file, const uint32_t line)
 }
 #endif /* IS_ENABLED(CONFIG_BT_CTLR_ASSERT_HANDLER) */
 
-
+uint32_t debugcmd_handle[10]={0};
 static int cmd_handle(struct net_buf *cmd)
 {
 	BT_DBG("");
-
+debugcmd_handle[0]++;
 	int errcode = MULTITHREADING_LOCK_ACQUIRE();
-
+debugcmd_handle[1]++;
 	if (!errcode) {
+debugcmd_handle[2]++;
 		errcode = hci_internal_cmd_put(cmd->data);
+debugcmd_handle[3]++;
 		MULTITHREADING_LOCK_RELEASE();
+debugcmd_handle[4]++;
 	}
+debugcmd_handle[5]++;
 	if (errcode) {
+debugcmd_handle[6]++;
 		return errcode;
 	}
-
+debugcmd_handle[7]++;
 	k_sem_give(&sem_recv);
-
+debugcmd_handle[8]++;
 	return 0;
 }
 
@@ -225,37 +230,49 @@ static int acl_handle(struct net_buf *acl)
 }
 #endif
 
+uint32_t debughci_driver_send[15]={0};
 static int hci_driver_send(struct net_buf *buf)
 {
 	int err;
 	uint8_t type;
-
+debughci_driver_send[0]++;
 	BT_DBG("");
 
 	if (!buf->len) {
+debughci_driver_send[1]++;
 		BT_DBG("Empty HCI packet");
+debughci_driver_send[2]++;
 		return -EINVAL;
 	}
-
+debughci_driver_send[3]++;
 	type = bt_buf_get_type(buf);
+debughci_driver_send[4]++;
 	switch (type) {
+debughci_driver_send[5]++;
 #if defined(CONFIG_BT_CONN)
 	case BT_BUF_ACL_OUT:
+debughci_driver_send[6]++;
 		err = acl_handle(buf);
+debughci_driver_send[7]++;
 		break;
 #endif          /* CONFIG_BT_CONN */
 	case BT_BUF_CMD:
+debughci_driver_send[8]++;
 		err = cmd_handle(buf);
+debughci_driver_send[9]++;
 		break;
 	default:
+debughci_driver_send[10]++;
 		BT_DBG("Unknown HCI type %u", type);
 		return -EINVAL;
 	}
-
+debughci_driver_send[11]++;
 	if (!err) {
+debughci_driver_send[12]++;
 		net_buf_unref(buf);
+debughci_driver_send[13]++;
 	}
-
+debughci_driver_send[14]++;
 	BT_DBG("Exit: %d", err);
 	return err;
 }
@@ -398,7 +415,7 @@ static bool fetch_and_process_acl_data(uint8_t *p_hci_buffer)
 	data_packet_process(p_hci_buffer);
 	return true;
 }
-
+uint32_t debugrecv_thread[10]={0};
 static void recv_thread(void *p1, void *p2, void *p3)
 {
 	ARG_UNUSED(p1);
@@ -414,21 +431,23 @@ static void recv_thread(void *p1, void *p2, void *p3)
 
 	bool received_evt = false;
 	bool received_data = false;
-
+debugrecv_thread[0]++;
 	while (true) {
+debugrecv_thread[1]++;
 		if (!received_evt && !received_data) {
 			/* Wait for a signal from the controller. */
 			k_sem_take(&sem_recv, K_FOREVER);
 		}
-
+debugrecv_thread[2]++;
 		received_evt = fetch_and_process_hci_evt(&hci_buffer[0]);
-
+debugrecv_thread[3]++;
 		if (IS_ENABLED(CONFIG_BT_CONN)) {
 			received_data = fetch_and_process_acl_data(&hci_buffer[0]);
 		}
-
+debugrecv_thread[4]++;
 		/* Let other threads of same priority run in between. */
 		k_yield();
+debugrecv_thread[5]++;
 	}
 }
 

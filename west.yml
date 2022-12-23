@@ -22,7 +22,7 @@ manifest:
       url-base: https://github.com/nrfconnect
     # Third-party repository sources:
     - name: zephyrproject
-      url-base: https://github.com/jyotibabasahebyadav-eaton/sdk-zephyr
+      url-base: https://github.com/jyotibabasahebyadav-eaton
     - name: throwtheswitch
       url-base: https://github.com/ThrowTheSwitch
     - name: armmbed
@@ -52,7 +52,9 @@ manifest:
     # https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/modules.html
     - name: zephyr
       remote: zephyrproject
-      revision: f82cc7f69077cd05f7f6abd3d3a2c5e99359a3cc
+      repo-path: sdk-zephyr
+      #revision: f82cc7f69077cd05f7f6abd3d3a2c5e99359a3cc
+      revision: v2.7.99-ncs1-1
       import:
         # In addition to the zephyr repository itself, NCS also
         # imports the contents of zephyr/west.yml at the above
@@ -98,6 +100,7 @@ manifest:
     # Some of these are also Zephyr modules which have NCS-specific
     # changes.
     - name: mcuboot
+      remote: zephyrproject
       repo-path: sdk-mcuboot
       revision: v1.8.99-ncs1
       path: bootloader/mcuboot

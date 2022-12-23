@@ -140,32 +140,40 @@ static bool is_host_using_legacy_and_extended_commands(uint16_t hci_opcode)
 #endif /* CONFIG_BT_HCI */
 }
 
+uint32_t debugencode_command_status[5]={0};
+struct bt_hci_evt_hdr *debugevt_hdr = {0};
+struct bt_hci_evt_cmd_status *debugevt_data = {0};
 static void encode_command_status(uint8_t * const event,
 				  uint16_t hci_opcode,
 				  uint8_t status_code)
 {
 
 	struct bt_hci_evt_hdr *evt_hdr = (struct bt_hci_evt_hdr *)event;
+debugevt_hdr = evt_hdr;
 	struct bt_hci_evt_cmd_status *evt_data =
 			(struct bt_hci_evt_cmd_status *)&event[BT_HCI_EVT_HDR_SIZE];
-
+debugevt_data = evt_data;
+debugencode_command_status[0]++;
 	evt_hdr->evt = BT_HCI_EVT_CMD_STATUS;
 	evt_hdr->len = sizeof(struct bt_hci_evt_cmd_status);
-
+debugencode_command_status[1]++;
 	evt_data->status = status_code;
+debugencode_command_status[2]++;
 	evt_data->ncmd = 1;
 	evt_data->opcode = hci_opcode;
 }
-
+struct bt_hci_evt_hdr *debugevt_hdr1 = {0};
+struct bt_hci_evt_cmd_status *debugevt_data2 = {0};
 static void encode_command_complete_header(uint8_t * const event,
 					   uint16_t hci_opcode,
 					   uint8_t param_length,
 					   uint8_t status)
 {
 	struct bt_hci_evt_hdr *evt_hdr = (struct bt_hci_evt_hdr *)event;
+        debugevt_hdr1 = evt_hdr;
 	struct bt_hci_evt_cmd_complete *evt_data =
 			(struct bt_hci_evt_cmd_complete *)&event[BT_HCI_EVT_HDR_SIZE];
-
+debugevt_data2=evt_data;
 	evt_hdr->evt = BT_HCI_EVT_CMD_COMPLETE;
 	evt_hdr->len = param_length;
 	evt_data->ncmd = 1;
@@ -173,32 +181,37 @@ static void encode_command_complete_header(uint8_t * const event,
 	event[BT_HCI_EVT_HDR_SIZE + sizeof(struct bt_hci_evt_cmd_complete)] = status;
 }
 
+uint32_t debugsupported_commands[20] = {0};
+sdc_hci_ip_supported_commands_t *debugcmds = {0};
 static void supported_commands(sdc_hci_ip_supported_commands_t *cmds)
 {
+debugsupported_commands[0]++;
+debugcmds = cmds;
 	memset(cmds, 0, sizeof(*cmds));
-
+debugsupported_commands[1]++;
 #if defined(CONFIG_BT_CONN)
+debugsupported_commands[2]++;
 	cmds->hci_disconnect = 1;
 	cmds->hci_read_remote_version_information = 1;
 #endif
-
+debugsupported_commands[3]++;
 	cmds->hci_set_event_mask = 1;
 	cmds->hci_reset = 1;
-
+debugsupported_commands[4]++;
 #if defined(CONFIG_BT_CONN)
 	cmds->hci_read_transmit_power_level = 1;
 #endif
-
+debugsupported_commands[5]++;
 #if defined(CONFIG_BT_HCI_ACL_FLOW_CONTROL)
 	cmds->hci_set_controller_to_host_flow_control = 1;
 	cmds->hci_host_buffer_size = 1;
 	cmds->hci_host_number_of_completed_packets = 1;
 #endif
-
+debugsupported_commands[6]++;
 	cmds->hci_read_local_version_information = 1;
 	cmds->hci_read_local_supported_features = 1;
 	cmds->hci_read_bd_addr = 1;
-
+debugsupported_commands[7]++;
 #if defined(CONFIG_BT_CTLR_CONN_RSSI)
 	cmds->hci_read_rssi = 1;
 #endif
@@ -206,7 +219,7 @@ static void supported_commands(sdc_hci_ip_supported_commands_t *cmds)
 #if defined(CONFIG_BT_CTLR_LE_ENC) && defined(CONFIG_BT_CTLR_LE_PING)
 	cmds->hci_set_event_mask_page_2 = 1;
 #endif
-
+debugsupported_commands[8]++;
 	cmds->hci_le_set_event_mask = 1;
 	cmds->hci_le_read_buffer_size_v1 = 1;
 	cmds->hci_le_read_local_supported_features = 1;
@@ -219,7 +232,7 @@ static void supported_commands(sdc_hci_ip_supported_commands_t *cmds)
 	cmds->hci_le_set_scan_response_data = 1;
 	cmds->hci_le_set_advertising_enable = 1;
 #endif
-
+debugsupported_commands[9]++;
 #if defined(CONFIG_BT_OBSERVER)
 	cmds->hci_le_set_scan_parameters = 1;
 	cmds->hci_le_set_scan_enable = 1;
@@ -229,7 +242,7 @@ static void supported_commands(sdc_hci_ip_supported_commands_t *cmds)
 	cmds->hci_le_create_connection = 1;
 	cmds->hci_le_create_connection_cancel = 1;
 #endif
-
+debugsupported_commands[10]++;
 	cmds->hci_le_read_white_list_size = 1;
 	cmds->hci_le_clear_white_list = 1;
 	cmds->hci_le_add_device_to_white_list = 1;
@@ -242,12 +255,12 @@ static void supported_commands(sdc_hci_ip_supported_commands_t *cmds)
 #if defined(CONFIG_BT_CENTRAL) || defined(CONFIG_BT_CTLR_ADV_EXT)
 	cmds->hci_le_set_host_channel_classification = 1;
 #endif
-
+debugsupported_commands[11]++;
 #if defined(CONFIG_BT_CONN)
 	cmds->hci_le_read_channel_map = 1;
 	cmds->hci_le_read_remote_features = 1;
 #endif
-
+debugsupported_commands[12]++;
 	cmds->hci_le_encrypt = 1;
 	cmds->hci_le_rand = 1;
 
@@ -259,7 +272,7 @@ static void supported_commands(sdc_hci_ip_supported_commands_t *cmds)
 	cmds->hci_le_long_term_key_request_reply = 1;
 	cmds->hci_le_long_term_key_request_negative_reply = 1;
 #endif
-
+debugsupported_commands[13]++;
 	cmds->hci_le_read_supported_states = 1;
 
 	/* NOTE: The DTM commands are *not* supported by the SoftDevice
@@ -302,6 +315,7 @@ static void supported_commands(sdc_hci_ip_supported_commands_t *cmds)
 	/* NOTE: The DTM commands are *not* supported by the SoftDevice
 	 * controller. See doc/nrf/known_issues.rst.
 	 */
+debugsupported_commands[14]++;
 	cmds->hci_le_receiver_test_v2 = 1;
 	cmds->hci_le_transmitter_test_v2 = 1;
 
@@ -341,6 +355,7 @@ static void supported_commands(sdc_hci_ip_supported_commands_t *cmds)
 	cmds->hci_le_set_periodic_advertising_receive_enable = 1;
 #endif
 #endif
+debugsupported_commands[15]++;
 	cmds->hci_le_read_transmit_power = 1;
 
 #if defined(CONFIG_BT_CTLR_PRIVACY)
@@ -614,54 +629,68 @@ static uint8_t status_param_cmd_put(uint8_t const * const cmd,
 	}
 }
 
+uint32_t debugle_controller_cmd_put[20]={0};
 static uint8_t le_controller_cmd_put(uint8_t const * const cmd,
 				     uint8_t * const raw_event_out,
 				     uint8_t *param_length_out)
 {
+debugle_controller_cmd_put[0]++;
 	uint8_t const *cmd_params = &cmd[BT_HCI_CMD_HDR_SIZE];
 	uint8_t * const event_out_params = &raw_event_out[CMD_COMPLETE_MIN_SIZE];
 	uint16_t opcode = sys_get_le16(cmd);
-
+debugle_controller_cmd_put[1]++;
 	switch (opcode)	{
+debugle_controller_cmd_put[2]++;
 	case SDC_HCI_OPCODE_CMD_LE_SET_EVENT_MASK:
+debugle_controller_cmd_put[3]++;
 		return sdc_hci_cmd_le_set_event_mask((void *)cmd_params);
 
 	case SDC_HCI_OPCODE_CMD_LE_READ_BUFFER_SIZE:
+debugle_controller_cmd_put[4]++;
 		*param_length_out += sizeof(sdc_hci_cmd_le_read_buffer_size_return_t);
 		return sdc_hci_cmd_le_read_buffer_size((void *)event_out_params);
 
 	case SDC_HCI_OPCODE_CMD_LE_READ_LOCAL_SUPPORTED_FEATURES:
+debugle_controller_cmd_put[5]++;
 		*param_length_out += sizeof(sdc_hci_cmd_le_read_local_supported_features_return_t);
 		le_supported_features((void *)event_out_params);
 		return 0;
 
 	case SDC_HCI_OPCODE_CMD_LE_SET_RANDOM_ADDRESS:
+debugle_controller_cmd_put[6]++;
 		return sdc_hci_cmd_le_set_random_address((void *)cmd_params);
 
 #if defined(CONFIG_BT_BROADCASTER)
 	case SDC_HCI_OPCODE_CMD_LE_SET_ADV_PARAMS:
+debugle_controller_cmd_put[7]++;
 		return sdc_hci_cmd_le_set_adv_params((void *)cmd_params);
 
 	case SDC_HCI_OPCODE_CMD_LE_READ_ADV_PHYSICAL_CHANNEL_TX_POWER:
+        debugle_controller_cmd_put[8]++;
 		*param_length_out +=
 				sizeof(sdc_hci_cmd_le_read_adv_physical_channel_tx_power_return_t);
 		return sdc_hci_cmd_le_read_adv_physical_channel_tx_power((void *)event_out_params);
 
 	case SDC_HCI_OPCODE_CMD_LE_SET_ADV_DATA:
+debugle_controller_cmd_put[9]++;
 		return sdc_hci_cmd_le_set_adv_data((void *)cmd_params);
 
 	case SDC_HCI_OPCODE_CMD_LE_SET_SCAN_RESPONSE_DATA:
+debugle_controller_cmd_put[10]++;
 		return sdc_hci_cmd_le_set_scan_response_data((void *)cmd_params);
 
 	case SDC_HCI_OPCODE_CMD_LE_SET_ADV_ENABLE:
+        debugle_controller_cmd_put[11]++;
 		return sdc_hci_cmd_le_set_adv_enable((void *)cmd_params);
 #endif
 
 #if defined(CONFIG_BT_OBSERVER)
 	case SDC_HCI_OPCODE_CMD_LE_SET_SCAN_PARAMS:
+        debugle_controller_cmd_put[12]++;
 		return sdc_hci_cmd_le_set_scan_params((void *)cmd_params);
 
 	case SDC_HCI_OPCODE_CMD_LE_SET_SCAN_ENABLE:
+        debugle_controller_cmd_put[13]++;
 		return sdc_hci_cmd_le_set_scan_enable((void *)cmd_params);
 #endif
 
@@ -674,16 +703,20 @@ static uint8_t le_controller_cmd_put(uint8_t const * const cmd,
 #endif
 
 	case SDC_HCI_OPCODE_CMD_LE_READ_WHITE_LIST_SIZE:
+debugle_controller_cmd_put[14]++;
 		*param_length_out += sizeof(sdc_hci_cmd_le_read_white_list_size_return_t);
 		return sdc_hci_cmd_le_read_white_list_size((void *)event_out_params);
 
 	case SDC_HCI_OPCODE_CMD_LE_CLEAR_WHITE_LIST:
+debugle_controller_cmd_put[15]++;
 		return sdc_hci_cmd_le_clear_white_list();
 
 	case SDC_HCI_OPCODE_CMD_LE_ADD_DEVICE_TO_WHITE_LIST:
+debugle_controller_cmd_put[16]++;
 		return sdc_hci_cmd_le_add_device_to_white_list((void *)cmd_params);
 
 	case SDC_HCI_OPCODE_CMD_LE_REMOVE_DEVICE_FROM_WHITE_LIST:
+debugle_controller_cmd_put[17]++;
 		return sdc_hci_cmd_le_remove_device_from_white_list((void *)cmd_params);
 
 #if defined(CONFIG_BT_CENTRAL)
@@ -698,19 +731,23 @@ static uint8_t le_controller_cmd_put(uint8_t const * const cmd,
 
 #if defined(CONFIG_BT_CONN)
 	case SDC_HCI_OPCODE_CMD_LE_READ_CHANNEL_MAP:
+debugle_controller_cmd_put[18]++;
 		*param_length_out += sizeof(sdc_hci_cmd_le_read_channel_map_return_t);
 		return sdc_hci_cmd_le_read_channel_map((void *)cmd_params,
 						       (void *)event_out_params);
 
 	case SDC_HCI_OPCODE_CMD_LE_READ_REMOTE_FEATURES:
+debugle_controller_cmd_put[19]++;
 		return sdc_hci_cmd_le_read_remote_features((void *)cmd_params);
 #endif
 
 	case SDC_HCI_OPCODE_CMD_LE_ENCRYPT:
+debugle_controller_cmd_put[20]++;
 		*param_length_out += sizeof(sdc_hci_cmd_le_encrypt_return_t);
 		return sdc_hci_cmd_le_encrypt((void *)cmd_params, (void *)event_out_params);
 
 	case SDC_HCI_OPCODE_CMD_LE_RAND:
+debugle_controller_cmd_put[21]++;
 		*param_length_out += sizeof(sdc_hci_cmd_le_rand_return_t);
 		return sdc_hci_cmd_le_rand((void *)event_out_params);
 
@@ -721,11 +758,13 @@ static uint8_t le_controller_cmd_put(uint8_t const * const cmd,
 
 #if defined(CONFIG_BT_PERIPHERAL)
 	case SDC_HCI_OPCODE_CMD_LE_LONG_TERM_KEY_REQUEST_REPLY:
+debugle_controller_cmd_put[22]++;
 		*param_length_out += sizeof(sdc_hci_cmd_le_long_term_key_request_reply_return_t);
 		return sdc_hci_cmd_le_long_term_key_request_reply((void *)cmd_params,
 								  (void *)event_out_params);
 
 	case SDC_HCI_OPCODE_CMD_LE_LONG_TERM_KEY_REQUEST_NEGATIVE_REPLY:
+debugle_controller_cmd_put[23]++;
 		*param_length_out +=
 			sizeof(sdc_hci_cmd_le_long_term_key_request_negative_reply_return_t);
 		return sdc_hci_cmd_le_long_term_key_request_negative_reply(
@@ -734,6 +773,7 @@ static uint8_t le_controller_cmd_put(uint8_t const * const cmd,
 #endif
 
 	case SDC_HCI_OPCODE_CMD_LE_READ_SUPPORTED_STATES:
+debugle_controller_cmd_put[24]++;
 		*param_length_out += sizeof(sdc_hci_cmd_le_read_supported_states_return_t);
 		le_read_supported_states((void *)event_out_params);
 		return 0;
@@ -879,6 +919,7 @@ static uint8_t le_controller_cmd_put(uint8_t const * const cmd,
 #endif /* CONFIG_BT_CTLR_ADV_EXT */
 
 	case SDC_HCI_OPCODE_CMD_LE_READ_TRANSMIT_POWER:
+debugle_controller_cmd_put[25]++;
 		*param_length_out += sizeof(sdc_hci_cmd_le_read_transmit_power_return_t);
 		return sdc_hci_cmd_le_read_transmit_power((void *)event_out_params);
 
@@ -893,8 +934,10 @@ static uint8_t le_controller_cmd_put(uint8_t const * const cmd,
 #endif
 
 	default:
+        debugle_controller_cmd_put[26]++;
 		return BT_HCI_ERR_UNKNOWN_CMD;
 	}
+debugle_controller_cmd_put[27]++;
 }
 
 #if defined(CONFIG_BT_HCI_VS)
@@ -959,97 +1002,130 @@ static uint8_t vs_cmd_put(uint8_t const * const cmd,
 	}
 }
 #endif /* CONFIG_BT_HCI_VS */
-
+uint32_t debugcmd_put[22] = {0};
 static void cmd_put(uint8_t *cmd_in, uint8_t * const raw_event_out)
 {
 	uint8_t status;
+        debugcmd_put[0]++;
 	uint16_t opcode = sys_get_le16(cmd_in);
-
+debugcmd_put[1]++;
 	/* Assume command complete */
 	uint8_t return_param_length = sizeof(struct bt_hci_evt_cmd_complete)
 				      + sizeof(struct bt_hci_evt_cc_status);
 
 	switch (BT_OGF(opcode)) {
+debugcmd_put[2]++;
 #if defined(CONFIG_BT_CONN)
 	case BT_OGF_LINK_CTRL:
+debugcmd_put[3]++;
 		status = link_control_cmd_put(cmd_in);
+debugcmd_put[4]++;
 		break;
 #endif
 	case BT_OGF_BASEBAND:
+debugcmd_put[5]++;
 		status = controller_and_baseband_cmd_put(cmd_in,
 							 raw_event_out,
 							 &return_param_length);
+debugcmd_put[6]++;
 		break;
 	case BT_OGF_INFO:
+debugcmd_put[7]++;
 		status = info_param_cmd_put(cmd_in,
 					    raw_event_out,
 					    &return_param_length);
+debugcmd_put[8]++;
 		break;
 	case BT_OGF_STATUS:
+debugcmd_put[9]++;
 		status = status_param_cmd_put(cmd_in,
 					      raw_event_out,
 					      &return_param_length);
+debugcmd_put[10]++;
 		break;
 	case BT_OGF_LE:
+debugcmd_put[11]++;
 		status = le_controller_cmd_put(cmd_in,
 					       raw_event_out,
 					       &return_param_length);
+debugcmd_put[12]++;
 		break;
 #if defined(CONFIG_BT_HCI_VS)
 	case BT_OGF_VS:
+debugcmd_put[13]++;
 		status = vs_cmd_put(cmd_in,
 				    raw_event_out,
 				    &return_param_length);
+debugcmd_put[14]++;
 		break;
 #endif
 	default:
+debugcmd_put[15]++;
 		status = BT_HCI_ERR_UNKNOWN_CMD;
 		break;
 	}
 
 	if (!command_generates_command_complete_event(opcode) ||
 	    (status == BT_HCI_ERR_UNKNOWN_CMD))	{
+debugcmd_put[16]++;
 		encode_command_status(raw_event_out, opcode, status);
+debugcmd_put[17]++;
 	} else {
+debugcmd_put[18]++;
 		encode_command_complete_header(raw_event_out, opcode, return_param_length, status);
+debugcmd_put[19]++;
 	}
+debugcmd_put[20]++;
 }
 
+uint32_t debughci_internal_cmd_put[15] = {0};
 int hci_internal_cmd_put(uint8_t *cmd_in)
 {
+debughci_internal_cmd_put[0]++;
 	uint16_t opcode = sys_get_le16(cmd_in);
-
+debughci_internal_cmd_put[1]++;
 	if (cmd_complete_or_status.occurred) {
+debughci_internal_cmd_put[2]++;
 		return -NRF_EPERM;
 	}
-
+debughci_internal_cmd_put[3]++;
 	if ((((struct bt_hci_cmd_hdr *)cmd_in)->param_len + BT_HCI_CMD_HDR_SIZE)
 		> HCI_CMD_PACKET_MAX_SIZE) {
+debughci_internal_cmd_put[4]++;
 		return -EINVAL;
 	}
-
+debughci_internal_cmd_put[5]++;
 	if (!IS_ENABLED(CONFIG_BT_CTLR_ADV_EXT)) {
+debughci_internal_cmd_put[6]++;
 		cmd_put(cmd_in, &cmd_complete_or_status.raw_event[0]);
+debughci_internal_cmd_put[7]++;
 	} else if (!is_host_using_legacy_and_extended_commands(opcode)) {
+debughci_internal_cmd_put[8]++;
 		cmd_put(cmd_in, &cmd_complete_or_status.raw_event[0]);
+debughci_internal_cmd_put[9]++;
 	} else {
 		/* The host is violating the specification
 		 * by mixing legacy and extended commands.
 		 */
+debughci_internal_cmd_put[10]++;
 		if (command_generates_command_complete_event(opcode)) {
+debughci_internal_cmd_put[11]++;
 			uint8_t param_length = sizeof(struct bt_hci_evt_cmd_complete)
 					     + sizeof(struct bt_hci_evt_cc_status);
 			(void)encode_command_complete_header(cmd_complete_or_status.raw_event,
 							     opcode,
 							     param_length,
 							     BT_HCI_ERR_CMD_DISALLOWED);
+debughci_internal_cmd_put[12]++;
 		} else {
+debughci_internal_cmd_put[13]++;
 			(void)encode_command_status(cmd_complete_or_status.raw_event,
 						    opcode,
 						    BT_HCI_ERR_CMD_DISALLOWED);
+debughci_internal_cmd_put[14]++;
 		}
 	}
-
+debughci_internal_cmd_put[15]++;
 #if defined(CONFIG_BT_HCI_ACL_FLOW_CONTROL)
 	if ((opcode != SDC_HCI_OPCODE_CMD_CB_HOST_NUMBER_OF_COMPLETED_PACKETS)
 	    ||
@@ -1059,10 +1135,10 @@ int hci_internal_cmd_put(uint8_t *cmd_in)
 		/* SDC_HCI_OPCODE_CMD_CB_HOST_NUMBER_OF_COMPLETED_PACKETS will only generate
 		 *  command complete if it fails.
 		 */
-
+debughci_internal_cmd_put[16]++;
 		cmd_complete_or_status.occurred = true;
 	}
-
+debughci_internal_cmd_put[17]++;
 	return 0;
 }
 
