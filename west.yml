@@ -102,7 +102,7 @@ manifest:
     - name: mcuboot
       remote: zephyrproject
       repo-path: sdk-mcuboot
-      revision: v1.8.99-ncs1
+      revision: f8023f05364852a004814981c9ab045f27f85f4f
       path: bootloader/mcuboot
     - name: mbedtls-nrf
       path: mbedtls
