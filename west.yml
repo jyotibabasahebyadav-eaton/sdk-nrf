@@ -53,8 +53,8 @@ manifest:
     - name: zephyr
       remote: zephyrproject
       repo-path: sdk-zephyr
-      #revision: f82cc7f69077cd05f7f6abd3d3a2c5e99359a3cc
-      revision: v2.7.99-ncs1-1
+      revision: f80ce03e9312bd6a5b902c050ddb732c66da2166
+      #revision: v2.7.99-ncs1-1
       import:
         # In addition to the zephyr repository itself, NCS also
         # imports the contents of zephyr/west.yml at the above
@@ -102,7 +102,7 @@ manifest:
     - name: mcuboot
       remote: zephyrproject
       repo-path: sdk-mcuboot
-      revision: f8023f05364852a004814981c9ab045f27f85f4f
+      revision: 54f3b6821fbc71225d291f21dd9d91de17e2d0fa
       path: bootloader/mcuboot
     - name: mbedtls-nrf
       path: mbedtls
@@ -111,7 +111,7 @@ manifest:
     - name: nrfxlib
       repo-path: sdk-nrfxlib
       path: nrfxlib
-      revision: d73674733303370c212b42376c5522c2251b280e
+      revision: v1.9.1
     - name: trusted-firmware-m
       repo-path: sdk-trusted-firmware-m
       path: modules/tee/tf-m/trusted-firmware-m
