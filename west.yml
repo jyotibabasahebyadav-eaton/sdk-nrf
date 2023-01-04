@@ -53,7 +53,7 @@ manifest:
     - name: zephyr
       remote: zephyrproject
       repo-path: sdk-zephyr
-      revision: f80ce03e9312bd6a5b902c050ddb732c66da2166
+      revision: 9252dcc315325156d26e2a4493dd100567317bc9
       #revision: v2.7.99-ncs1-1
       import:
         # In addition to the zephyr repository itself, NCS also
