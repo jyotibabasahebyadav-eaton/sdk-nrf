@@ -308,7 +308,7 @@ static void handle_set_occupancy_delay_time(struct bt_mesh_model *model,
 				  struct net_buf_simple *buf)
 {
   uint16_t occupancyDelayTimeout = net_buf_simple_pull_le16(buf); 
-  setOccupancyDelayTime(occupancyDelayTimeout);
+  //setOccupancyDelayTime(occupancyDelayTimeout); //Commented as new architecture
   struct bt_mesh_lvl_status status = { 0 };
   //rsp_status(model, ctx, &status);
   dummyResponse(model, ctx);
@@ -319,7 +319,7 @@ static void handle_set_photocontrol(struct bt_mesh_model *model,
 				  struct net_buf_simple *buf)
 {
    uint8_t daylightHarvestingFlag = net_buf_simple_pull_u8(buf);
-   setPhotoControl((bool)daylightHarvestingFlag);
+  // setPhotoControl((bool)daylightHarvestingFlag); //Commented as new architecture
    //struct bt_mesh_lvl_status status = { 0 };
   //rsp_status(model, ctx, &status);
    dummyResponse(model, ctx);
@@ -332,7 +332,7 @@ static void handle_set_photocontrol_ref_luminance(struct bt_mesh_model *model,
   uint8_t photoControlRefLuminanceLSB = net_buf_simple_pull_u8(buf);
   uint8_t photoControlRefLuminanceMSB = net_buf_simple_pull_u8(buf);
 
-  setPhotoControlRefLuminance((uint16_t)(photoControlRefLuminanceMSB<<8 | photoControlRefLuminanceLSB) );
+ // setPhotoControlRefLuminance((uint16_t)(photoControlRefLuminanceMSB<<8 | photoControlRefLuminanceLSB) );   //Commented as new architecture
 //struct bt_mesh_lvl_status status = { 0 };
 //  rsp_status(model, ctx, &status);
  dummyResponse(model, ctx);
@@ -342,7 +342,7 @@ static void handle_set_active_cp_id(struct bt_mesh_model *model,
 				  struct net_buf_simple *buf)
 {
   uint8_t activeControlprofileId = net_buf_simple_pull_u8(buf);
-  setActiveControlprofileId(activeControlprofileId);
+  //setActiveControlprofileId(activeControlprofileId); //Commented as new architecture
 //struct bt_mesh_lvl_status status = { 0 };
 //  rsp_status(model, ctx, &status);
  dummyResponse(model, ctx);
